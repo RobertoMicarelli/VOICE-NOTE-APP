@@ -125,7 +125,7 @@ class VoiceRecorder {
             };
 
             this.mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(this.audioChunks, { type: 'audio/m4a' });
+                const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
                 const audioURL = URL.createObjectURL(audioBlob);
 
                 console.log("Attempting to load audio metadata for URL:", audioURL);
