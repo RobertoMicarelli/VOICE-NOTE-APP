@@ -604,15 +604,22 @@ Nota: Non inventare contenuti non presenti nell'audio. Se l'audio è poco chiaro
             const audio = new Audio(audioURL);
             audio.play().then(() => {
                 console.log("Audio started playing successfully.");
+                // Revoca l'URL solo dopo che l'audio ha finito di suonare
+                audio.onended = () => {
+                    URL.revokeObjectURL(audioURL);
+                    console.log("Blob URL revoked after playback.");
+                };
+                // Se l'audio si interrompe o fallisce per qualche motivo non previsto da .catch
+                audio.onerror = (e) => {
+                    console.error("Audio playback error (onended/onerror):");
+                    URL.revokeObjectURL(audioURL);
+                    console.log("Blob URL revoked due to audio error (onended/onerror).");
+                };
             }).catch(error => {
                 console.error("Error playing audio:", error);
                 alert("Impossibile riprodurre la registrazione. Errore: " + error.message + ". Controlla la console per i dettagli.");
-            }).finally(() => {
-                // Revoca l'URL dopo un breve ritardo, o dopo la riproduzione
-                // In un'app reale, dovresti gestire la riproduzione in modo più sofisticato
-                // Per ora, lo revochiamo subito dopo aver tentato il play.
-                URL.revokeObjectURL(audioURL);
-                console.log("Blob URL revoked.");
+                URL.revokeObjectURL(audioURL); // Revoca l'URL anche in caso di errore
+                console.log("Blob URL revoked due to initial play error.");
             });
         } catch (error) {
             console.error("Error playing recording from IndexedDB:", error);
